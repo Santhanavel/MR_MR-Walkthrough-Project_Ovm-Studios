@@ -1097,6 +1097,7 @@ MonoBehaviour:
   _anchorPrefab: {fileID: 789684486510353890, guid: d257e772d439e664db46073b17aadedf,
     type: 3}
   _followHand: 1
+  _anchorPrefabParentTransform: {fileID: 404099820}
 --- !u!114 &1062204115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1570,6 +1571,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53a81b2d9fbda444dbc346552d9a5f33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mAnchorsComp: []
   spawnPrefab: {fileID: 4451039732349150692, guid: 5779cd4cdab86bf4b9bf179f38c08888,
     type: 3}
   anchorLoader: {fileID: 1062204113}
