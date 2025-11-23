@@ -3674,7 +3674,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &899663407
 Light:
   m_ObjectHideFlags: 0
@@ -4766,7 +4766,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1631753607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5131,6 +5131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1710172463}
   - component: {fileID: 1710172462}
+  - component: {fileID: 1710172464}
   m_Layer: 0
   m_Name: Anchor Manager
   m_TagString: Untagged
@@ -5175,6 +5176,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1710172464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710172461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c9d33600e92b74cb3bca61bd2bec1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isLoading: 0
 --- !u!1001 &1714987483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5634,6 +5648,24 @@ MonoBehaviour:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: 'Change to VR '
+    Button: 4
+    ButtonMode: 0
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1710172464}
+          m_TargetAssemblyTypeName: SceneManager, Assembly-CSharp
+          m_MethodName: LoadScene
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
@@ -9250,11 +9282,11 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 899663408}
+  - {fileID: 1680965690}
   - {fileID: 1631753609}
   - {fileID: 265111795}
   - {fileID: 1552726892}
   - {fileID: 1752878566}
   - {fileID: 212220780}
   - {fileID: 510295037}
-  - {fileID: 1680965690}
   - {fileID: 1710172463}
