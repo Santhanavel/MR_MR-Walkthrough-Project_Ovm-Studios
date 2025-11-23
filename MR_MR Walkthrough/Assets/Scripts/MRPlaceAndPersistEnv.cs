@@ -1,5 +1,6 @@
 using Meta.XR.BuildingBlocks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -21,6 +22,8 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
     public const string EnvRotGuid = "EnvRotGuid";
 
     public bool isEnvLoaded = false;
+
+    public ControllerButtonsMapper controllerButtonsMapper;
     private void Start()
     {
         anchorCore.OnAnchorsEraseAllCompleted.AddListener(ClearGUID);
@@ -34,23 +37,16 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         if (isEnvLoaded)
             return;
 
-
-        LoadObject(anchorObj, EnvPosGuid);
-        GameObject an = FindAnchorByGuid(GUIDs[0]);
-        Instantiate(EnvObj, an.transform.position, Quaternion.identity);
-
-        LoadObject(anchorObj, EnvRotGuid);
-        GameObject a = FindAnchorByGuid(GUIDs[1]);
-        Instantiate(EnvObjPrefab, a.transform.position, Quaternion.identity);
+        LoadObject(anchorObj, EnvObj, EnvPosGuid);
+        LoadObject(anchorObj, EnvObjPrefab, EnvRotGuid);
+        StartCoroutine(Rotate());
+        //  controllerButtonsMapper.enabled = false;
         isEnvLoaded = true;
     }
-    public void LoadEnvRot()
-    {
-       
-    }
+   
+  
 
-
-    private void LoadObject(GameObject prefab , string anchorGuid)
+    private void LoadObject(GameObject anchor ,GameObject GameObj , string anchorGuid)
     {
         string guidString = PlayerPrefs.GetString(anchorGuid);
         List<Guid> guidEnv = new List<Guid>();
@@ -59,8 +55,9 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         {
             guidEnv.Add(guid);
             Debug.Log("Converted to GUID: " + guid);
-            anchorCore.LoadAndInstantiateAnchors(prefab, guidEnv);
-
+            anchorCore.LoadAndInstantiateAnchors(anchor, guidEnv);
+            StartCoroutine(loadAncObj(guidEnv[0], GameObj));
+            GUIDs.Add(guid);
         }
         else
         {
@@ -68,6 +65,12 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         }
     }
 
+    IEnumerator loadAncObj(Guid guidEnv, GameObject obj)
+    {
+        yield return new WaitForSeconds(3f);
+        GameObject an = FindAnchorByGuid(guidEnv);
+        Instantiate(obj, an.transform.position, Quaternion.identity);
+    }
 
 
     public GameObject FindAnchorByGuid(Guid uuid)
@@ -114,4 +117,16 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
             PlayerPrefs.Save();
         }
     }
+
+    IEnumerator Rotate()
+    {
+        yield return new WaitForSeconds(6f);
+
+        EnvAutoAlign alin = FindAnyObjectByType<EnvAutoAlign>();
+
+        if (alin != null)
+        alin.Rotate();
+
+    }
+
 }
