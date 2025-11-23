@@ -16,7 +16,7 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
     
     public SpatialAnchorCoreBuildingBlock anchorCore;
     public SpatialAnchorLoaderBuildingBlock anchorLoader;
-
+    public NotificationData notificationData;
 
     public const string EnvPosGuid = "EnvPosGuid";
     public const string EnvRotGuid = "EnvRotGuid";
@@ -30,8 +30,6 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         anchorCore.OnAnchorCreateCompleted.AddListener(FindGUIDs);
     }
 
-
-
     public void LoadEnv()
     {
         if (isEnvLoaded)
@@ -40,12 +38,9 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         LoadObject(anchorObj, EnvObj, EnvPosGuid);
         LoadObject(anchorObj, EnvObjPrefab, EnvRotGuid);
         StartCoroutine(Rotate());
-        //  controllerButtonsMapper.enabled = false;
         isEnvLoaded = true;
     }
    
-  
-
     private void LoadObject(GameObject anchor ,GameObject GameObj , string anchorGuid)
     {
         string guidString = PlayerPrefs.GetString(anchorGuid);
@@ -69,7 +64,9 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
     {
         yield return new WaitForSeconds(3f);
         GameObject an = FindAnchorByGuid(guidEnv);
-        Instantiate(obj, an.transform.position, Quaternion.identity);
+        GameObject env = Instantiate(obj, an.transform.position, Quaternion.identity);
+        Anchors.Add(an.GetComponent<OVRSpatialAnchor>());
+        env.transform.parent = an.transform;
     }
 
 
@@ -92,7 +89,15 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         if (result == OperationResult.Success)
         {
             Guid uuid = loadedAnchor.Uuid;
+            Anchors.Add(loadedAnchor);
             GUIDs.Add(uuid);
+            notificationData.ShowPopUp(0);
+
+        }
+        else
+        {
+            notificationData.ShowPopUp(5);
+
         }
 
     }
@@ -102,20 +107,37 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         if (result == OperationResult.Success)
         {
             GUIDs.Clear();
+            Anchors.Clear();
             PlayerPrefs.DeleteKey(EnvPosGuid);
             PlayerPrefs.DeleteKey(EnvRotGuid);
+            notificationData.ShowPopUp(1);
+            isEnvLoaded = false;
+
         }
-       
+        else
+        {
+            notificationData.ShowPopUp(6);
+
+        }
+
+    }
+    public void ClearGUID()
+    {
+        GUIDs.Clear();
+        Anchors.Clear();
+        PlayerPrefs.DeleteKey(EnvPosGuid);
+        PlayerPrefs.DeleteKey(EnvRotGuid);
+        notificationData.ShowPopUp(1);
+        isEnvLoaded = false;
     }
 
     public void SaveGUIDs()
     {
-        if (GUIDs.Count <=2)
-        {
-            PlayerPrefs.SetString(EnvPosGuid, GUIDs[0].ToString());
-            PlayerPrefs.SetString(EnvRotGuid, GUIDs[1].ToString());
-            PlayerPrefs.Save();
-        }
+        PlayerPrefs.SetString(EnvPosGuid, GUIDs[0].ToString());
+        PlayerPrefs.SetString(EnvRotGuid, GUIDs[1].ToString());
+        PlayerPrefs.Save();
+        notificationData.ShowPopUp(2);
+
     }
 
     IEnumerator Rotate()
@@ -126,7 +148,16 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
 
         if (alin != null)
         alin.Rotate();
+        if (Anchors.Count > 0)
+        {
+            notificationData.ShowPopUp(3);
+            controllerButtonsMapper.enabled = false;
 
+        }
+        else
+        {
+            notificationData.ShowPopUp(4);
+        }
     }
 
 }
