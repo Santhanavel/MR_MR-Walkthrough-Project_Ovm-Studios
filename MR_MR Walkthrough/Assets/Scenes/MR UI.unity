@@ -1374,124 +1374,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!1 &899663406
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 899663408}
-  - component: {fileID: 899663407}
-  - component: {fileID: 899663409}
-  m_Layer: 0
-  m_Name: Directional Light
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!108 &899663407
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 899663406}
-  m_Enabled: 1
-  serializedVersion: 10
-  m_Type: 1
-  m_Shape: 0
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
-  m_Range: 10
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
-  m_Shadows:
-    m_Type: 2
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
---- !u!4 &899663408
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 899663406}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.31440756, y: 0.18736218, z: 0.28240764, w: 0.8867296}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 26.857, y: 34.855, z: 43.904}
---- !u!114 &899663409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 899663406}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Version: 3
-  m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
-  m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
-  m_LightCookieSize: {x: 1, y: 1}
-  m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
 --- !u!1 &1133320283
 GameObject:
   m_ObjectHideFlags: 0
@@ -2083,146 +1965,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1631753606
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1631753609}
-  - component: {fileID: 1631753608}
-  - component: {fileID: 1631753607}
-  m_Layer: 0
-  m_Name: PointableCanvasModule
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1631753607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631753606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2518c50cb3fc6a6458d4b743c2f69c7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  _useInitialPressPositionForDrag: 1
-  _exclusiveMode: 0
---- !u!114 &1631753608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631753606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
-  m_DragThreshold: 10
---- !u!4 &1631753609
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631753606}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.087, y: 0.92696327, z: 0.30910337}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1680406034 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6988153848384741085, guid: 0a7d2469f24041c4284c66706f84c45e,
     type: 3}
   m_PrefabInstance: {fileID: 1702328051}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1680965689
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1680965690}
-  - component: {fileID: 1680965691}
-  - component: {fileID: 1680965692}
-  m_Layer: 0
-  m_Name: Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1680965690
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1680965689}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1680965691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1680965689}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50983f6351d93a54296e28ed5b298737, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _menuButtonGO: {fileID: 2055562244}
-  _menuGO: {fileID: 0}
-  _setupSelectionGO: {fileID: 0}
-  _setupButtonGO: {fileID: 0}
-  _viewButtonGO: {fileID: 0}
---- !u!114 &1680965692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1680965689}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53a81b2d9fbda444dbc346552d9a5f33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mAnchorsComp: []
-  spawnPrefab: {fileID: 4451039732349150692, guid: 5779cd4cdab86bf4b9bf179f38c08888,
-    type: 3}
-  anchorLoader: {fileID: 212220777}
-  anchorCore: {fileID: 1552726890}
-  OnMultipleAnchorsFound:
-    m_PersistentCalls:
-      m_Calls: []
-  anchors: []
 --- !u!1001 &1702328051
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2420,6 +2168,8 @@ MonoBehaviour:
   EnvObjPrefab: {fileID: 4569963204604913677, guid: e04e945b25fe64c49b5b3811e85b05fc,
     type: 3}
   Anchors: []
+  _cameraRig: {fileID: 265111793}
+  AnchorSpawner: {fileID: 212220778}
   anchorCore: {fileID: 1552726890}
   anchorLoader: {fileID: 212220777}
   notificationData: {fileID: 2055562247}
@@ -2502,9 +2252,39 @@ MonoBehaviour:
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
+          m_CallState: 0
+        - m_Target: {fileID: 1710172462}
+          m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
+          m_MethodName: CreateAnchor
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: Save spatial anchors PlayerPrefs
+    Button: 2
+    ButtonMode: 0
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1710172462}
+          m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
+          m_MethodName: SaveGUIDs
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
           m_CallState: 2
   - Title: Load and spawn spatial anchors
-    Button: 2
+    Button: 4
     ButtonMode: 0
     Callback:
       m_PersistentCalls:
@@ -2522,95 +2302,15 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
   - Title: Erase all spatial anchors
-    Button: 32768
+    Button: 8
     ButtonMode: 0
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1552726890}
-          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorCoreBuildingBlock,
-            Meta.XR.BuildingBlocks
-          m_MethodName: EraseAllAnchors
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
         - m_Target: {fileID: 1710172462}
           m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
           m_MethodName: ClearGUID
           m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - Title: Save spatial anchors PlayerPrefs
-    Button: 16384
-    ButtonMode: 2
-    Callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1710172462}
-          m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
-          m_MethodName: SaveGUIDs
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - Title: 'Change to VR '
-    Button: 4
-    ButtonMode: 0
-    Callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1710172464}
-          m_TargetAssemblyTypeName: SceneManager, Assembly-CSharp
-          m_MethodName: LoadScene
-          m_Mode: 3
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 1
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - Title: Clear All Anchor
-    Button: 8
-    ButtonMode: 2
-    Callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 212220777}
-          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorLoaderBuildingBlock,
-            Meta.XR.BuildingBlocks
-          m_MethodName: LoadAnchorsFromDefaultLocalStorage
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 2055562247}
-          m_TargetAssemblyTypeName: NotificationData, Assembly-CSharp
-          m_MethodName: ShowPopUp
-          m_Mode: 3
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2792,7 +2492,7 @@ GameObject:
   - component: {fileID: 2055562246}
   - component: {fileID: 2055562247}
   m_Layer: 0
-  m_Name: Menu button
+  m_Name: Notification
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2850,24 +2550,13 @@ MonoBehaviour:
   - _message: Anchor Created
     _icon: {fileID: -5482114419278944634, guid: 64f884351318b694f942625580e64a8b,
       type: 3}
+  - _message: Anchor Saved
+    _icon: {fileID: 8846257451492774937, guid: 4f3b4a4ae58ad484e9fc92ab68a8ffef, type: 3}
   - _message: Anchor Cleared
     _icon: {fileID: -5749830677736848442, guid: 64f884351318b694f942625580e64a8b,
       type: 3}
-  - _message: Anchor Saved
-    _icon: {fileID: 8846257451492774937, guid: 4f3b4a4ae58ad484e9fc92ab68a8ffef, type: 3}
   - _message: Environment Loaded
     _icon: {fileID: 5487809786283018963, guid: 64f884351318b694f942625580e64a8b, type: 3}
-  - _message: Environment Loading failed
-    _icon: {fileID: -3859721741372743784, guid: 64f884351318b694f942625580e64a8b,
-      type: 3}
-  - _message: Anchor Create failed
-    _icon: {fileID: -3859721741372743784, guid: 64f884351318b694f942625580e64a8b,
-      type: 3}
-  - _message: Anchor Clear failed
-    _icon: {fileID: -3859721741372743784, guid: 64f884351318b694f942625580e64a8b,
-      type: 3}
-  - _message: All Anchor Loaded
-    _icon: {fileID: 4544990495591111694, guid: 4f3b4a4ae58ad484e9fc92ab68a8ffef, type: 3}
 --- !u!1 &2129827094
 GameObject:
   m_ObjectHideFlags: 0
@@ -3038,13 +2727,10 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 899663408}
-  - {fileID: 1680965690}
-  - {fileID: 1631753609}
-  - {fileID: 2055562245}
   - {fileID: 265111795}
   - {fileID: 1552726892}
   - {fileID: 1752878566}
   - {fileID: 212220780}
   - {fileID: 510295037}
+  - {fileID: 2055562245}
   - {fileID: 1710172463}

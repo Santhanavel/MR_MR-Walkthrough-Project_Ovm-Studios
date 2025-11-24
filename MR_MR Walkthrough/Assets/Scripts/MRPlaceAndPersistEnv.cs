@@ -2,6 +2,7 @@ using Meta.XR.BuildingBlocks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using static OVRSpatialAnchor;
@@ -13,7 +14,9 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
     public GameObject EnvObjPrefab;
     public List<Guid> GUIDs = new List<Guid>();
     public List<OVRSpatialAnchor> Anchors = new List<OVRSpatialAnchor>();
-    
+    private Transform _anchorPrefabTransform;
+    public OVRCameraRig _cameraRig;
+    public SpatialAnchorSpawnerBuildingBlock AnchorSpawner;
     public SpatialAnchorCoreBuildingBlock anchorCore;
     public SpatialAnchorLoaderBuildingBlock anchorLoader;
     public NotificationData notificationData;
@@ -26,64 +29,88 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
     public ControllerButtonsMapper controllerButtonsMapper;
     private void Start()
     {
-        anchorCore.OnAnchorsEraseAllCompleted.AddListener(ClearGUID);
+        _anchorPrefabTransform = _cameraRig.rightControllerAnchor.transform.GetChild(0);
+        _anchorPrefabTransform.localPosition = Vector3.zero;
+        _anchorPrefabTransform.localRotation = Quaternion.identity;
+      ///  anchorCore.OnAnchorsEraseAllCompleted.AddListener(ClearGUID);
         anchorCore.OnAnchorCreateCompleted.AddListener(FindGUIDs);
     }
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            ClearGUID();
+        }
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+            LoadEnv();
+        }
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            SaveGUIDs();
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            CreateAnchor();
+        }
 
+
+    }
     public void LoadEnv()
     {
-        if (isEnvLoaded)
-            return;
+        if (isEnvLoaded) return;
 
-        LoadObject(anchorObj, EnvObj, EnvPosGuid);
-        LoadObject(anchorObj, EnvObjPrefab, EnvRotGuid);
+        LoadAndSpawn(EnvPosGuid, EnvObj);
+        LoadAndSpawn(EnvRotGuid, EnvObjPrefab);
+
         StartCoroutine(Rotate());
         isEnvLoaded = true;
     }
-   
-    private void LoadObject(GameObject anchor ,GameObject GameObj , string anchorGuid)
+
+    private void LoadAndSpawn(string guidKey, GameObject prefab)
     {
-        string guidString = PlayerPrefs.GetString(anchorGuid);
-        List<Guid> guidEnv = new List<Guid>();
-
-        if (Guid.TryParse(guidString, out Guid guid))
+        if (!Guid.TryParse(PlayerPrefs.GetString(guidKey), out Guid guid))
         {
-            guidEnv.Add(guid);
-            Debug.Log("Converted to GUID: " + guid);
-            anchorCore.LoadAndInstantiateAnchors(anchor, guidEnv);
-            StartCoroutine(loadAncObj(guidEnv[0], GameObj));
-            GUIDs.Add(guid);
-        }
-        else
-        {
-            Debug.LogWarning("Invalid GUID string!");
-        }
-    }
-
-    IEnumerator loadAncObj(Guid guidEnv, GameObject obj)
-    {
-        yield return new WaitForSeconds(3f);
-        GameObject an = FindAnchorByGuid(guidEnv);
-        GameObject env = Instantiate(obj, an.transform.position, Quaternion.identity);
-        Anchors.Add(an.GetComponent<OVRSpatialAnchor>());
-        env.transform.parent = an.transform;
-    }
-
-
-    public GameObject FindAnchorByGuid(Guid uuid)
-    {
-       OVRSpatialAnchor[] anchors = FindObjectsOfType<OVRSpatialAnchor>();
-
-        foreach (OVRSpatialAnchor a in anchors)
-        {
-            Guid id = a.Uuid;  // or AnchorId / Id depending on SDK version
-            if (id == uuid)
-                return a.gameObject;
+            Debug.LogWarning("Invalid GUID string for " + guidKey);
+            return;
         }
 
-        return null;
+        GUIDs.Add(guid);
+        var guidList = new List<Guid> { guid };
+
+        anchorCore.LoadAndInstantiateAnchors(anchorObj, guidList);
+        StartCoroutine(SpawnAfterAnchorLoad(guid, prefab));
     }
 
+    private IEnumerator SpawnAfterAnchorLoad(Guid guid, GameObject prefab)
+    {
+        OVRSpatialAnchor anchor = null;
+        float t = 0;
+
+        while (anchor == null && t < 10f)
+        {
+            anchor = FindAnchorByGuid(guid)?.GetComponent<OVRSpatialAnchor>();
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        if (anchor == null)
+        {
+            Debug.LogError("Anchor not found after timeout");
+            yield break;
+        }
+
+        var obj = Instantiate(prefab, anchor.transform.position, Quaternion.identity);
+        obj.transform.SetParent(anchor.transform);
+
+        Anchors.Add(anchor);
+    }
+
+    public GameObject FindAnchorByGuid(Guid uuid) =>
+      FindObjectsOfType<OVRSpatialAnchor>()
+          .FirstOrDefault(a => a.Uuid == uuid)?.gameObject;
+
+    #region Create Anchor
     public void FindGUIDs(OVRSpatialAnchor loadedAnchor , OperationResult result)
     {
         if (result == OperationResult.Success)
@@ -91,72 +118,95 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
             Guid uuid = loadedAnchor.Uuid;
             Anchors.Add(loadedAnchor);
             GUIDs.Add(uuid);
-            notificationData.ShowPopUp(0);
+          //  notificationData.ShowPopUp(0);
 
+        }
+      
+    }
+
+    public void CreateAnchor()
+    {
+        if(Anchors.Count < 2)
+        {
+            AnchorSpawner.SpawnSpatialAnchor(_anchorPrefabTransform.position, _anchorPrefabTransform.rotation);
+            notificationData.ShowPopUp(0);
         }
         else
         {
-            notificationData.ShowPopUp(5);
-
+            Debug.LogError("2 anchor Created");
         }
-
     }
+
+    #endregion
 
     public void ClearGUID(OperationResult result)
     {
         if (result == OperationResult.Success)
         {
-            GUIDs.Clear();
-            Anchors.Clear();
-            PlayerPrefs.DeleteKey(EnvPosGuid);
-            PlayerPrefs.DeleteKey(EnvRotGuid);
-            notificationData.ShowPopUp(1);
-            isEnvLoaded = false;
+            /* anchorCore.EraseAnchorByUuid(GUIDs[0]);
+             anchorCore.EraseAnchorByUuid(GUIDs[1]);
+             PlayerPrefs.DeleteKey(EnvPosGuid);
+             PlayerPrefs.DeleteKey(EnvRotGuid);
+             notificationData.ShowPopUp(2);
+             GUIDs.Clear();
+             Anchors.Clear();
+             isEnvLoaded = false;*/
 
-        }
-        else
-        {
-            notificationData.ShowPopUp(6);
+            notificationData.ShowPopUp(0);
 
         }
 
     }
     public void ClearGUID()
     {
-        GUIDs.Clear();
-        Anchors.Clear();
+/*        if (Anchors.Count > 0)
+        {
+            for (int i = 0; i < Anchors.Count; i++)
+            {
+                anchorCore.EraseAnchorByUuid(GUIDs[i]);
+            }
+            GUIDs.Clear();
+            Anchors.Clear();
+        }
+*/
         PlayerPrefs.DeleteKey(EnvPosGuid);
         PlayerPrefs.DeleteKey(EnvRotGuid);
-        notificationData.ShowPopUp(1);
+        notificationData.ShowPopUp(2);
+        anchorCore.EraseAllAnchors();
+
         isEnvLoaded = false;
     }
 
     public void SaveGUIDs()
     {
+        if (GUIDs.Count < 2)
+        {
+            Debug.LogWarning("Not enough GUIDs to save!");
+            return;
+        }
+
         PlayerPrefs.SetString(EnvPosGuid, GUIDs[0].ToString());
         PlayerPrefs.SetString(EnvRotGuid, GUIDs[1].ToString());
         PlayerPrefs.Save();
-        notificationData.ShowPopUp(2);
 
+        notificationData.ShowPopUp(1);
     }
-
     IEnumerator Rotate()
     {
-        yield return new WaitForSeconds(6f);
+        float t = 0f;
 
-        EnvAutoAlign alin = FindAnyObjectByType<EnvAutoAlign>();
+        while (Anchors.Count < 2 && t < 10f)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
 
-        if (alin != null)
-        alin.Rotate();
+        FindAnyObjectByType<EnvAutoAlign>()?.Rotate();
+
         if (Anchors.Count > 0)
         {
             notificationData.ShowPopUp(3);
             controllerButtonsMapper.enabled = false;
-
-        }
-        else
-        {
-            notificationData.ShowPopUp(4);
         }
     }
 
