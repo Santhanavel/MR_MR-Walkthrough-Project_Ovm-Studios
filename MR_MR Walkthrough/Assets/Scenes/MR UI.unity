@@ -2509,19 +2509,6 @@ MonoBehaviour:
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 212220777}
-          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorLoaderBuildingBlock,
-            Meta.XR.BuildingBlocks
-          m_MethodName: LoadAnchorsFromDefaultLocalStorage
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
         - m_Target: {fileID: 1710172462}
           m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
           m_MethodName: LoadEnv
@@ -2597,6 +2584,37 @@ MonoBehaviour:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: Clear All Anchor
+    Button: 8
+    ButtonMode: 2
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 212220777}
+          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorLoaderBuildingBlock,
+            Meta.XR.BuildingBlocks
+          m_MethodName: LoadAnchorsFromDefaultLocalStorage
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 2055562247}
+          m_TargetAssemblyTypeName: NotificationData, Assembly-CSharp
+          m_MethodName: ShowPopUp
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
@@ -2848,6 +2866,8 @@ MonoBehaviour:
   - _message: Anchor Clear failed
     _icon: {fileID: -3859721741372743784, guid: 64f884351318b694f942625580e64a8b,
       type: 3}
+  - _message: All Anchor Loaded
+    _icon: {fileID: 4544990495591111694, guid: 4f3b4a4ae58ad484e9fc92ab68a8ffef, type: 3}
 --- !u!1 &2129827094
 GameObject:
   m_ObjectHideFlags: 0
