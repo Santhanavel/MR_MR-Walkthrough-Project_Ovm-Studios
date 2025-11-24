@@ -14,9 +14,9 @@ public class MetaNotificationManager : MonoBehaviour
     public List<Image> images;
     public TMP_Text messageText;
 
-    // original colors
     private List<Color> imageBaseColors = new List<Color>();
     private Color textBaseColor;
+
     public float showDuration = 2f;
     public float fadeSpeed = 3f;
 
@@ -24,29 +24,33 @@ public class MetaNotificationManager : MonoBehaviour
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
             instance = this;
         else
-            Destroy(instance);
+            Destroy(gameObject);
     }
+
     void Start()
     {
         _anchorPrefabTransform.parent = _cameraRig.rightControllerAnchor;
         _anchorPrefabTransform.localPosition = Vector3.zero;
         _anchorPrefabTransform.localRotation = Quaternion.identity;
-        // Store original colors
+
         foreach (var img in images)
             imageBaseColors.Add(img.color);
+
         textBaseColor = messageText.color;
+
         SetAlpha(0);
     }
 
-
-    public void Show(string message , Sprite Icon)
+    public void Show(string message, Sprite icon)
     {
         StopAllCoroutines();
+
         messageText.text = message;
-        images[1].sprite = Icon;
+        images[1].sprite = icon;
+
         StartCoroutine(FadeRoutine());
     }
 
@@ -62,25 +66,23 @@ public class MetaNotificationManager : MonoBehaviour
         yield return new WaitForSeconds(showDuration);
 
         // Fade out
-        for (float a = 1f; a >= -1f; a -= Time.deltaTime * fadeSpeed)
+        for (float a = 1f; a >= 0; a -= Time.deltaTime * fadeSpeed)
         {
             SetAlpha(a);
             yield return null;
         }
+        SetAlpha(0);
+
     }
 
-    // Apply alpha to all images + text
     private void SetAlpha(float alpha)
     {
-        // images
         for (int i = 0; i < images.Count; i++)
         {
             var baseColor = imageBaseColors[i];
             images[i].color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
         }
 
-        // text
         messageText.color = new Color(textBaseColor.r, textBaseColor.g, textBaseColor.b, alpha);
     }
 }
-

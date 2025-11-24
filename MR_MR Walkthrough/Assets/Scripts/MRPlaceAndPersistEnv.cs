@@ -1,187 +1,105 @@
-using Meta.XR.BuildingBlocks;
+﻿using Meta.XR.BuildingBlocks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using static OVRSpatialAnchor;
 
 public class MRPlaceAndPersistEnv : MonoBehaviour
 {
+    [Header("Prefabs / References")]
     public GameObject anchorObj;
     public GameObject EnvObj;
     public GameObject EnvObjPrefab;
-    public List<Guid> GUIDs = new List<Guid>();
-    public List<OVRSpatialAnchor> Anchors = new List<OVRSpatialAnchor>();
-    private Transform _anchorPrefabTransform;
+
+    [Header("References / Scripts")]
+
     public OVRCameraRig _cameraRig;
     public SpatialAnchorSpawnerBuildingBlock AnchorSpawner;
     public SpatialAnchorCoreBuildingBlock anchorCore;
-    public SpatialAnchorLoaderBuildingBlock anchorLoader;
+
     public NotificationData notificationData;
+    public ControllerButtonsMapper controllerButtonsMapper;
+
+    [Header("Runtime Data")]
+    private Transform _anchorPrefabTransform;
+    public List<Guid> GUIDs = new();
+    public List<OVRSpatialAnchor> Anchors = new();
+
+    private bool isEnvLoaded = false;
+    private bool isSaved = false;
+    private bool isInPlacement = false;
 
     public const string EnvPosGuid = "EnvPosGuid";
     public const string EnvRotGuid = "EnvRotGuid";
 
-    public bool isEnvLoaded = false;
-
-    public ControllerButtonsMapper controllerButtonsMapper;
     private void Start()
     {
         _anchorPrefabTransform = _cameraRig.rightControllerAnchor.transform.GetChild(0);
         _anchorPrefabTransform.localPosition = Vector3.zero;
         _anchorPrefabTransform.localRotation = Quaternion.identity;
-      ///  anchorCore.OnAnchorsEraseAllCompleted.AddListener(ClearGUID);
-        anchorCore.OnAnchorCreateCompleted.AddListener(FindGUIDs);
+
+        anchorCore.OnAnchorCreateCompleted.AddListener(OnAnchorCreated);
+
+        isSaved = PlayerPrefs.HasKey(EnvPosGuid) && PlayerPrefs.HasKey(EnvRotGuid);
     }
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.E))
-        {
-            ClearGUID();
-        }
-        if (Input.GetKeyUp(KeyCode.L))
-        {
-            LoadEnv();
-        }
-        if (Input.GetKeyUp(KeyCode.S))
-        {
-            SaveGUIDs();
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            CreateAnchor();
-        }
-
-
-    }
-    public void LoadEnv()
-    {
-        if (isEnvLoaded) return;
-
-        LoadAndSpawn(EnvPosGuid, EnvObj);
-        LoadAndSpawn(EnvRotGuid, EnvObjPrefab);
-
-        StartCoroutine(Rotate());
-        isEnvLoaded = true;
-    }
-
-    private void LoadAndSpawn(string guidKey, GameObject prefab)
-    {
-        if (!Guid.TryParse(PlayerPrefs.GetString(guidKey), out Guid guid))
-        {
-            Debug.LogWarning("Invalid GUID string for " + guidKey);
-            return;
-        }
-
-        GUIDs.Add(guid);
-        var guidList = new List<Guid> { guid };
-
-        anchorCore.LoadAndInstantiateAnchors(anchorObj, guidList);
-        StartCoroutine(SpawnAfterAnchorLoad(guid, prefab));
-    }
-
-    private IEnumerator SpawnAfterAnchorLoad(Guid guid, GameObject prefab)
-    {
-        OVRSpatialAnchor anchor = null;
-        float t = 0;
-
-        while (anchor == null && t < 10f)
-        {
-            anchor = FindAnchorByGuid(guid)?.GetComponent<OVRSpatialAnchor>();
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        if (anchor == null)
-        {
-            Debug.LogError("Anchor not found after timeout");
-            yield break;
-        }
-
-        var obj = Instantiate(prefab, anchor.transform.position, Quaternion.identity);
-        obj.transform.SetParent(anchor.transform);
-
-        Anchors.Add(anchor);
-    }
-
-    public GameObject FindAnchorByGuid(Guid uuid) =>
-      FindObjectsOfType<OVRSpatialAnchor>()
-          .FirstOrDefault(a => a.Uuid == uuid)?.gameObject;
-
-    #region Create Anchor
-    public void FindGUIDs(OVRSpatialAnchor loadedAnchor , OperationResult result)
-    {
-        if (result == OperationResult.Success)
-        {
-            Guid uuid = loadedAnchor.Uuid;
-            Anchors.Add(loadedAnchor);
-            GUIDs.Add(uuid);
-          //  notificationData.ShowPopUp(0);
-
-        }
-      
-    }
+    // ----------------------------------------------------------
+    // 1️⃣ CREATE ANCHORS
+    // ----------------------------------------------------------
+    #region CREATE ANCHORS
 
     public void CreateAnchor()
     {
-        if(Anchors.Count < 2)
+        if (isSaved)
         {
-            AnchorSpawner.SpawnSpatialAnchor(_anchorPrefabTransform.position, _anchorPrefabTransform.rotation);
-            notificationData.ShowPopUp(0);
+            notificationData.Show(NotificationType.Error, "Anchors already saved!");
+            return;
         }
-        else
+
+        if (Anchors.Count >= 2)
         {
-            Debug.LogError("2 anchor Created");
+            notificationData.Show(NotificationType.Error, "Already created 2 anchors.");
+            return;
         }
+
+        isInPlacement = true;
+
+        AnchorSpawner.SpawnSpatialAnchor(
+            _anchorPrefabTransform.position,
+            _anchorPrefabTransform.rotation
+        );
+
+        notificationData.Show(NotificationType.CreateAnchor);
     }
 
+    private void OnAnchorCreated(OVRSpatialAnchor anchor, OperationResult result)
+    {
+        if (result != OperationResult.Success) return;
+
+        Anchors.Add(anchor);
+        GUIDs.Add(anchor.Uuid);
+
+        if (Anchors.Count == 2)
+            notificationData.Show(NotificationType.CreateAnchor, "Two anchors placed. You can now save.");
+    }
     #endregion
 
-    public void ClearGUID(OperationResult result)
-    {
-        if (result == OperationResult.Success)
-        {
-            /* anchorCore.EraseAnchorByUuid(GUIDs[0]);
-             anchorCore.EraseAnchorByUuid(GUIDs[1]);
-             PlayerPrefs.DeleteKey(EnvPosGuid);
-             PlayerPrefs.DeleteKey(EnvRotGuid);
-             notificationData.ShowPopUp(2);
-             GUIDs.Clear();
-             Anchors.Clear();
-             isEnvLoaded = false;*/
-
-            notificationData.ShowPopUp(0);
-
-        }
-
-    }
-    public void ClearGUID()
-    {
-/*        if (Anchors.Count > 0)
-        {
-            for (int i = 0; i < Anchors.Count; i++)
-            {
-                anchorCore.EraseAnchorByUuid(GUIDs[i]);
-            }
-            GUIDs.Clear();
-            Anchors.Clear();
-        }
-*/
-        PlayerPrefs.DeleteKey(EnvPosGuid);
-        PlayerPrefs.DeleteKey(EnvRotGuid);
-        notificationData.ShowPopUp(2);
-        anchorCore.EraseAllAnchors();
-
-        isEnvLoaded = false;
-    }
-
+    // ----------------------------------------------------------
+    // 2️⃣ SAVE
+    // ----------------------------------------------------------
+    #region SAVE
     public void SaveGUIDs()
     {
-        if (GUIDs.Count < 2)
+        if (isSaved)
         {
-            Debug.LogWarning("Not enough GUIDs to save!");
+            notificationData.Show(NotificationType.Error, "Already saved!");
+            return;
+        }
+
+        if (Anchors.Count < 2)
+        {
+            notificationData.Show(NotificationType.Error, "Need exactly 2 anchors to save.");
             return;
         }
 
@@ -189,25 +107,130 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
         PlayerPrefs.SetString(EnvRotGuid, GUIDs[1].ToString());
         PlayerPrefs.Save();
 
-        notificationData.ShowPopUp(1);
-    }
-    IEnumerator Rotate()
-    {
-        float t = 0f;
+        isSaved = true;
+        isInPlacement = false;
 
-        while (Anchors.Count < 2 && t < 10f)
+        notificationData.Show(NotificationType.SaveSuccess);
+    }
+    #endregion
+
+    // ----------------------------------------------------------
+    // 3️⃣ LOAD
+    // ----------------------------------------------------------
+    #region LOAD
+
+    public void LoadEnv()
+    {
+        if (!isSaved)
         {
+            notificationData.Show(NotificationType.Error, "No saved anchors. Place & save first.");
+            return;
+        }
+
+        if (isEnvLoaded)
+        {
+            notificationData.Show(NotificationType.Error, "Environment already loaded.");
+            return;
+        }
+
+        LoadAndSpawn(EnvPosGuid, EnvObj);
+        LoadAndSpawn(EnvRotGuid, EnvObjPrefab);
+
+        StartCoroutine(AutoRotate());
+        isEnvLoaded = true;
+    }
+
+    private void LoadAndSpawn(string key, GameObject prefab)
+    {
+        if (!Guid.TryParse(PlayerPrefs.GetString(key), out Guid guid))
+        {
+            notificationData.Show(NotificationType.Error, "Saved anchor ID invalid!");
+            return;
+        }
+
+        anchorCore.LoadAndInstantiateAnchors(anchorObj, new List<Guid> { guid });
+        StartCoroutine(SpawnWhenReady(guid, prefab));
+    }
+
+    private IEnumerator SpawnWhenReady(Guid guid, GameObject prefab)
+    {
+        OVRSpatialAnchor anchor = null;
+        float t = 0;
+
+        while (anchor == null && t < 10)
+        {
+            anchor = FindAnchor(guid);
             t += Time.deltaTime;
             yield return null;
         }
 
-        FindAnyObjectByType<EnvAutoAlign>()?.Rotate();
-
-        if (Anchors.Count > 0)
+        if (anchor == null)
         {
-            notificationData.ShowPopUp(3);
-            controllerButtonsMapper.enabled = false;
+            notificationData.Show(NotificationType.Error, "Anchor load failed.");
+            yield break;
         }
+        GUIDs.Add(guid);
+        Anchors.Add(anchor);
+
+        var envObj = Instantiate(prefab, anchor.transform.position, Quaternion.identity);
+        envObj.transform.SetParent(anchor.transform);
     }
 
+    public OVRSpatialAnchor FindAnchor(Guid guid) =>
+        FindObjectsOfType<OVRSpatialAnchor>().FirstOrDefault(a => a.Uuid == guid);
+    #endregion
+
+    // ----------------------------------------------------------
+    // 4️⃣ AUTO ROTATE / ALIGN
+    // ----------------------------------------------------------
+    #region ALIGN
+    private IEnumerator AutoRotate()
+    {
+        EnvAutoAlign alin = null;
+
+        // Wait until EnvAutoAlign exists in scene
+        while (alin == null)
+        {
+            alin = FindAnyObjectByType<EnvAutoAlign>();
+            yield return null;
+        }
+
+        alin.Rotate();
+        notificationData.Show(NotificationType.LoadSuccess);
+       // controllerButtonsMapper.enabled = false;
+    }
+    #endregion
+    // ----------------------------------------------------------
+    // 5️⃣ DELETE
+    // ----------------------------------------------------------
+    #region DELETE
+    public void ClearAll()
+    {
+        if (!isSaved && Anchors.Count == 0)
+        {
+            notificationData.Show(NotificationType.Error, "Nothing to delete.");
+            return;
+        }
+
+        PlayerPrefs.DeleteKey(EnvPosGuid);
+        PlayerPrefs.DeleteKey(EnvRotGuid);
+        PlayerPrefs.Save();
+
+        isSaved = false;
+        isEnvLoaded = false;
+        isInPlacement = false;
+
+        GUIDs.Clear();
+
+        anchorCore.EraseAllAnchors();
+
+        foreach (var anchor in Anchors)
+            if (anchor != null)
+                Destroy(anchor.gameObject);
+
+        Anchors.Clear();
+
+        notificationData.Show(NotificationType.ClearSuccess);
+    }
+    #endregion
 }

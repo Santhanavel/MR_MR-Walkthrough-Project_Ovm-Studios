@@ -1,20 +1,52 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum NotificationType
+{
+    CreateAnchor,
+    SaveSuccess,
+    LoadSuccess,
+    ClearSuccess,
+    Error
+}
+
 public class NotificationData : MonoBehaviour
 {
-   public List<Data> data;
+    [Header("Notification Entries")]
+    public List<NotificationEntry> entries;
 
-    public void ShowPopUp(int index)
+    [Header("Error Icon (Used for all errors)")]
+    public Sprite errorIcon;
+
+    public void Show(NotificationType type, string overrideMessage = null)
     {
-        MetaNotificationManager.instance.Show(data[index]._message , data[index]._icon);
+        // ERROR notification (always use error icon)
+        if (type == NotificationType.Error)
+        {
+            string msg = string.IsNullOrEmpty(overrideMessage) ? "Something went wrong!" : overrideMessage;
+            MetaNotificationManager.instance.Show(msg, errorIcon);
+            return;
+        }
+
+        // Find matching entry
+        var entry = entries.Find(e => e.type == type);
+
+        if (entry != null)
+        {
+            string msg = string.IsNullOrEmpty(overrideMessage) ? entry.message : overrideMessage;
+            MetaNotificationManager.instance.Show(msg, entry.icon);
+        }
+        else
+        {
+            MetaNotificationManager.instance.Show("Missing notification entry!", errorIcon);
+        }
     }
 }
 
 [System.Serializable]
-public class Data
+public class NotificationEntry
 {
-    public string _message;
-    public Sprite _icon;
+    public NotificationType type;
+    public string message;
+    public Sprite icon;
 }

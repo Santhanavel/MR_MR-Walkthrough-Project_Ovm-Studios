@@ -1,38 +1,77 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnvAutoAlign : MonoBehaviour
 {
-    public Transform positionAnchor;     // Anchor A
-    public Transform rotationAnchor;     // Anchor B
-    public float rotateSpeed = 30f;      // Degrees per second
+    public Transform positionAnchor;     // Anchor A (position)
+    public Transform rotationAnchor;     // Anchor B (rotation)
+    public float rotateSpeed = 30f;
 
     public bool stopRotation = true;
+
     public MRPlaceAndPersistEnv placeAndPersistEnv;
-    private void Start()
+
+    private bool anchorsAssigned = false;
+    public void Rotate()
     {
+        stopRotation = false;
+        StartCoroutine(AssignAnchorsAndRotate());
+    }
+
+    /// <summary>
+    /// Waits until both anchors are found in the scene
+    /// </summary>
+    IEnumerator AssignAnchorsAndRotate()
+    {
+        anchorsAssigned = false;
+        float timeout = 10f;
+        float t = 0f;
         if (placeAndPersistEnv == null)
             placeAndPersistEnv = FindObjectOfType<MRPlaceAndPersistEnv>();
 
-        positionAnchor = placeAndPersistEnv.FindAnchorByGuid(placeAndPersistEnv.GUIDs[0]).gameObject.transform;
-        rotationAnchor = placeAndPersistEnv.FindAnchorByGuid(placeAndPersistEnv.GUIDs[1]).gameObject.transform;
-        
+        while (!anchorsAssigned && t < timeout)
+        {
+            if (placeAndPersistEnv.GUIDs.Count >= 2)
+            {
+                GameObject posObj = placeAndPersistEnv.FindAnchor(placeAndPersistEnv.GUIDs[0]).gameObject;
+                GameObject rotObj = placeAndPersistEnv.FindAnchor(placeAndPersistEnv.GUIDs[1]).gameObject;
+
+                if (posObj != null && rotObj != null)
+                {
+                    positionAnchor = posObj.transform;
+                    rotationAnchor = rotObj.transform;
+                    anchorsAssigned = true;
+                    break;
+                }
+            }
+
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        if (!anchorsAssigned)
+        {
+            Debug.LogError("EnvAutoAlign: Could not find anchors within timeout.");
+            stopRotation = true;
+            yield break;
+        }
+
+        Debug.Log("EnvAutoAlign: Anchors assigned. Starting rotation.");
     }
 
-    void Update()
+    private void Update()
     {
-        if (stopRotation) return;
-        if (rotationAnchor == null || positionAnchor == null) return;
+        if (stopRotation || !anchorsAssigned) return;
+        if (positionAnchor == null || rotationAnchor == null) return;
 
-        // Keep ENV at position anchor
+        // Keep ENV at correct real-world position
         transform.position = positionAnchor.position;
 
-        // Find direction from ENV to rotation anchor
+        // Direction from ENV to rotation anchor
         Vector3 direction = rotationAnchor.position - transform.position;
-        direction.y = 0f; // keep only horizontal direction
+        direction.y = 0f;
 
-        if (direction.sqrMagnitude > 0.01f)
+        if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.RotateTowards(
@@ -41,17 +80,8 @@ public class EnvAutoAlign : MonoBehaviour
                 rotateSpeed * Time.deltaTime
             );
         }
-        else
-        {
-            if(!stopRotation)
-            {
-                stopRotation = true;
-                Debug.Log("Rotation stopped — collider hit.");
-            }
-        }
     }
 
-    // Stop when colliders collide
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("RotationStop"))
@@ -60,9 +90,4 @@ public class EnvAutoAlign : MonoBehaviour
             Debug.Log("Rotation stopped — collider hit.");
         }
     }
-    public void Rotate()
-    {
-        stopRotation = false;
-    }
 }
-

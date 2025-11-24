@@ -732,7 +732,7 @@ MonoBehaviour:
   mrcActivationMode: 0
   launchSimultaneousHandsControllersOnStartup: 0
   isInsightPassthroughEnabled: 1
-  shouldBoundaryVisibilityBeSuppressed: 1
+  shouldBoundaryVisibilityBeSuppressed: 0
   requestBodyTrackingPermissionOnStartup: 0
   requestFaceTrackingPermissionOnStartup: 0
   requestEyeTrackingPermissionOnStartup: 0
@@ -916,7 +916,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &510295035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2167,14 +2167,12 @@ MonoBehaviour:
   EnvObj: {fileID: 4451039732349150692, guid: 5779cd4cdab86bf4b9bf179f38c08888, type: 3}
   EnvObjPrefab: {fileID: 4569963204604913677, guid: e04e945b25fe64c49b5b3811e85b05fc,
     type: 3}
-  Anchors: []
   _cameraRig: {fileID: 265111793}
   AnchorSpawner: {fileID: 212220778}
   anchorCore: {fileID: 1552726890}
-  anchorLoader: {fileID: 212220777}
   notificationData: {fileID: 2055562247}
-  isEnvLoaded: 0
   controllerButtonsMapper: {fileID: 1752878564}
+  Anchors: []
 --- !u!4 &1710172463
 Transform:
   m_ObjectHideFlags: 0
@@ -2240,19 +2238,6 @@ MonoBehaviour:
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 212220778}
-          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorSpawnerBuildingBlock,
-            Meta.XR.BuildingBlocks
-          m_MethodName: SpawnSpatialAnchor
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 0
         - m_Target: {fileID: 1710172462}
           m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
           m_MethodName: CreateAnchor
@@ -2309,7 +2294,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1710172462}
           m_TargetAssemblyTypeName: MRPlaceAndPersistEnv, Assembly-CSharp
-          m_MethodName: ClearGUID
+          m_MethodName: ClearAll
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -2546,17 +2531,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9088f0ab07706164caffd5c8415226c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data:
-  - _message: Anchor Created
-    _icon: {fileID: -5482114419278944634, guid: 64f884351318b694f942625580e64a8b,
-      type: 3}
-  - _message: Anchor Saved
-    _icon: {fileID: 8846257451492774937, guid: 4f3b4a4ae58ad484e9fc92ab68a8ffef, type: 3}
-  - _message: Anchor Cleared
-    _icon: {fileID: -5749830677736848442, guid: 64f884351318b694f942625580e64a8b,
-      type: 3}
-  - _message: Environment Loaded
-    _icon: {fileID: 5487809786283018963, guid: 64f884351318b694f942625580e64a8b, type: 3}
+  entries:
+  - type: 0
+    message: Anchor created successfully
+    icon: {fileID: 8466701636991653476, guid: 64f884351318b694f942625580e64a8b, type: 3}
+  - type: 1
+    message: Anchors saved
+    icon: {fileID: 4043165011326275102, guid: 64f884351318b694f942625580e64a8b, type: 3}
+  - type: 2
+    message: Environment loaded
+    icon: {fileID: 2849611149230594225, guid: 64f884351318b694f942625580e64a8b, type: 3}
+  - type: 3
+    message: All anchors deleted
+    icon: {fileID: 5487809786283018963, guid: 64f884351318b694f942625580e64a8b, type: 3}
+  errorIcon: {fileID: -5749830677736848442, guid: 64f884351318b694f942625580e64a8b,
+    type: 3}
 --- !u!1 &2129827094
 GameObject:
   m_ObjectHideFlags: 0
