@@ -21,7 +21,7 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
 
     public NotificationData notificationData;
     public ControllerButtonsMapper controllerButtonsMapper;
-
+    private EnvAutoAlign alin = null;
     [Header("Runtime Data")]
     private Transform _anchorPrefabTransform;
     public List<Guid> GUIDs = new();
@@ -33,6 +33,7 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
 
     public const string EnvPosGuid = "EnvPosGuid";
     public const string EnvRotGuid = "EnvRotGuid";
+    public const string EnvSavedRotation = "EnvSavedRotation";
 
     private void Start()
     {
@@ -186,19 +187,19 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
     #region ALIGN
     private IEnumerator AutoRotate()
     {
-        EnvAutoAlign alin = null;
-
         // Wait until EnvAutoAlign exists in scene
         while (alin == null)
         {
             alin = FindAnyObjectByType<EnvAutoAlign>();
             yield return null;
         }
-
+        // If first time → do auto-align
         alin.Rotate();
+
         notificationData.Show(NotificationType.LoadSuccess);
        // controllerButtonsMapper.enabled = false;
     }
+  
     #endregion
     // ----------------------------------------------------------
     // 5️⃣ DELETE
@@ -214,6 +215,7 @@ public class MRPlaceAndPersistEnv : MonoBehaviour
 
         PlayerPrefs.DeleteKey(EnvPosGuid);
         PlayerPrefs.DeleteKey(EnvRotGuid);
+        alin.ClearRotation();
         PlayerPrefs.Save();
 
         isSaved = false;

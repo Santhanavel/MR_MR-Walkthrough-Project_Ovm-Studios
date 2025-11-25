@@ -12,10 +12,26 @@ public class EnvAutoAlign : MonoBehaviour
     public MRPlaceAndPersistEnv placeAndPersistEnv;
 
     private bool anchorsAssigned = false;
+
+
+    private const string RotX = "EnvRotX";
+    private const string RotY = "EnvRotY";
+    private const string RotZ = "EnvRotZ";
+    private const string RotW = "EnvRotW";
+
+  
     public void Rotate()
     {
-        stopRotation = false;
-        StartCoroutine(AssignAnchorsAndRotate());
+        if(!HasSavedRotation())
+        {
+            stopRotation = false;
+            StartCoroutine(AssignAnchorsAndRotate());
+        }
+        else
+        {
+            LoadRotation(transform);
+        }
+      
     }
 
     /// <summary>
@@ -55,8 +71,6 @@ public class EnvAutoAlign : MonoBehaviour
             stopRotation = true;
             yield break;
         }
-
-        Debug.Log("EnvAutoAlign: Anchors assigned. Starting rotation.");
     }
 
     private void Update()
@@ -84,10 +98,57 @@ public class EnvAutoAlign : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("RotationStop"))
+        if(!stopRotation)
         {
-            stopRotation = true;
-            Debug.Log("Rotation stopped — collider hit.");
+            if (other.CompareTag("RotationStop"))
+            {
+                stopRotation = true;
+                if (!HasSavedRotation())
+                    SaveRotation(transform.rotation);
+            }
         }
+       
+    }
+    // Save rotation once the alignment is done
+    public static void SaveRotation(Quaternion rotation)
+    {
+        PlayerPrefs.SetFloat(RotX, rotation.x);
+        PlayerPrefs.SetFloat(RotY, rotation.y);
+        PlayerPrefs.SetFloat(RotZ, rotation.z);
+        PlayerPrefs.SetFloat(RotW, rotation.w);
+
+        PlayerPrefs.Save();
+        Debug.Log("Environment rotation saved.");
+    }
+
+    // Check if saved rotation exists
+    public bool HasSavedRotation()
+    {
+        return PlayerPrefs.HasKey(RotW);
+    }
+
+    // Load rotation and apply to object
+    public void LoadRotation(Transform env)
+    {
+        Quaternion rot = new Quaternion(
+            PlayerPrefs.GetFloat(RotX),
+            PlayerPrefs.GetFloat(RotY),
+            PlayerPrefs.GetFloat(RotZ),
+            PlayerPrefs.GetFloat(RotW)
+        );
+
+        env.rotation = rot;
+        Debug.Log("Applied saved environment rotation.");
+    }
+
+    // Remove rotation data on delete
+    public void ClearRotation()
+    {
+        PlayerPrefs.DeleteKey(RotX);
+        PlayerPrefs.DeleteKey(RotY);
+        PlayerPrefs.DeleteKey(RotZ);
+        PlayerPrefs.DeleteKey(RotW);
+
+        Debug.Log("Environment rotation cleared.");
     }
 }
