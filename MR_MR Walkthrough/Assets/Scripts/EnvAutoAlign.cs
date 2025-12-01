@@ -1,47 +1,59 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class EnvAutoAlign : MonoBehaviour
 {
-    public Transform positionAnchor;     // Anchor A (position)
-    public Transform rotationAnchor;     // Anchor B (rotation)
+    public Transform positionAnchor;
+    public Transform rotationAnchor;
     public float rotateSpeed = 30f;
 
     public bool stopRotation = true;
-
     public MRPlaceAndPersistEnv placeAndPersistEnv;
 
     private bool anchorsAssigned = false;
 
+    // Relative rotation keys
+    private const string RelRotX = "EnvRelRotX";
+    private const string RelRotY = "EnvRelRotY";
+    private const string RelRotZ = "EnvRelRotZ";
+    private const string RelRotW = "EnvRelRotW";
 
-    private const string RotX = "EnvRotX";
-    private const string RotY = "EnvRotY";
-    private const string RotZ = "EnvRotZ";
-    private const string RotW = "EnvRotW";
+    private Quaternion savedRelativeRotation;
 
-  
     public void Rotate()
     {
-        if(!HasSavedRotation())
+        if (!HasSavedRotation())
         {
             stopRotation = false;
             StartCoroutine(AssignAnchorsAndRotate());
         }
         else
         {
-            LoadRotation(transform);
+            StartCoroutine(AssignAnchorsAndLoad());
         }
-      
     }
 
-    /// <summary>
-    /// Waits until both anchors are found in the scene
-    /// </summary>
+    // ---------------------------
+    // FIND ANCHORS
+    // ---------------------------
     IEnumerator AssignAnchorsAndRotate()
+    {
+        yield return StartCoroutine(FindAnchors());
+        if (!anchorsAssigned) stopRotation = true;
+    }
+
+    IEnumerator AssignAnchorsAndLoad()
+    {
+        yield return StartCoroutine(FindAnchors());
+        if (anchorsAssigned) LoadRotation();
+    }
+
+    IEnumerator FindAnchors()
     {
         anchorsAssigned = false;
         float timeout = 10f;
         float t = 0f;
+
         if (placeAndPersistEnv == null)
             placeAndPersistEnv = FindObjectOfType<MRPlaceAndPersistEnv>();
 
@@ -49,106 +61,130 @@ public class EnvAutoAlign : MonoBehaviour
         {
             if (placeAndPersistEnv.GUIDs.Count >= 2)
             {
-                GameObject posObj = placeAndPersistEnv.FindAnchor(placeAndPersistEnv.GUIDs[0]).gameObject;
-                GameObject rotObj = placeAndPersistEnv.FindAnchor(placeAndPersistEnv.GUIDs[1]).gameObject;
+                var posObj = placeAndPersistEnv.FindAnchor(placeAndPersistEnv.GUIDs[0])?.gameObject;
+                var rotObj = placeAndPersistEnv.FindAnchor(placeAndPersistEnv.GUIDs[1])?.gameObject;
 
                 if (posObj != null && rotObj != null)
                 {
                     positionAnchor = posObj.transform;
                     rotationAnchor = rotObj.transform;
                     anchorsAssigned = true;
-                    break;
                 }
             }
 
             t += Time.deltaTime;
             yield return null;
         }
-
-        if (!anchorsAssigned)
-        {
-            Debug.LogError("EnvAutoAlign: Could not find anchors within timeout.");
-            stopRotation = true;
-            yield break;
-        }
     }
 
+    // ---------------------------
+    // UPDATE LOOP
+    // ---------------------------
     private void Update()
     {
-        if (stopRotation || !anchorsAssigned) return;
-        if (positionAnchor == null || rotationAnchor == null) return;
+        if (!anchorsAssigned) return;
 
-        // Keep ENV at correct real-world position
-        transform.position = positionAnchor.position;
+        // Always follow position anchor
+        if (positionAnchor != null)
+            transform.position = positionAnchor.position;
 
-        // Direction from ENV to rotation anchor
+        if (!stopRotation)
+            RotateTowardAnchor();
+    }
+
+    // ---------------------------
+    // ROTATION WITH THRESHOLD
+    // ---------------------------
+    private void RotateTowardAnchor()
+    {
+        if (rotationAnchor == null) return;
+
         Vector3 direction = rotationAnchor.position - transform.position;
         direction.y = 0f;
 
-        if (direction.sqrMagnitude > 0.001f)
+        if (direction.sqrMagnitude < 0.001f)
+            return;
+
+        Quaternion targetRot = Quaternion.LookRotation(direction);
+        float angle = Quaternion.Angle(transform.rotation, targetRot);
+
+        // ⭐ CRITICAL FIX: Stop rotating before perfect alignment
+        if (angle < 2f)
         {
-            Quaternion targetRot = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRot,
-                rotateSpeed * Time.deltaTime
-            );
+            stopRotation = true;
+
+            if (!HasSavedRotation())
+                SaveRotation();
+
+            return; // Stop micro-rotation that breaks triggers
         }
+
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRot,
+            rotateSpeed * Time.deltaTime
+        );
     }
 
+    // ---------------------------
+    // TRIGGER STOP
+    // ---------------------------
     private void OnTriggerEnter(Collider other)
     {
-        if(!stopRotation)
+        // Only listen if rotation is happening
+        if (stopRotation) return;
+
+        if (other.CompareTag("RotationStop"))
         {
-            if (other.CompareTag("RotationStop"))
-            {
-                stopRotation = true;
-                if (!HasSavedRotation())
-                    SaveRotation(transform.rotation);
-            }
+            stopRotation = true;
+
+            if (!HasSavedRotation())
+                SaveRotation();
         }
-       
     }
-    // Save rotation once the alignment is done
-    public static void SaveRotation(Quaternion rotation)
+
+    // ---------------------------
+    // SAVE / LOAD RELATIVE ROTATION
+    // ---------------------------
+    public void SaveRotation()
     {
-        PlayerPrefs.SetFloat(RotX, rotation.x);
-        PlayerPrefs.SetFloat(RotY, rotation.y);
-        PlayerPrefs.SetFloat(RotZ, rotation.z);
-        PlayerPrefs.SetFloat(RotW, rotation.w);
+        if (rotationAnchor == null) return;
+
+        savedRelativeRotation = Quaternion.Inverse(rotationAnchor.rotation) * transform.rotation;
+
+        PlayerPrefs.SetFloat(RelRotX, savedRelativeRotation.x);
+        PlayerPrefs.SetFloat(RelRotY, savedRelativeRotation.y);
+        PlayerPrefs.SetFloat(RelRotZ, savedRelativeRotation.z);
+        PlayerPrefs.SetFloat(RelRotW, savedRelativeRotation.w);
 
         PlayerPrefs.Save();
-        Debug.Log("Environment rotation saved.");
     }
 
-    // Check if saved rotation exists
-    public bool HasSavedRotation()
+    public void LoadRotation()
     {
-        return PlayerPrefs.HasKey(RotW);
-    }
+        if (!HasSavedRotation() || rotationAnchor == null)
+            return;
 
-    // Load rotation and apply to object
-    public void LoadRotation(Transform env)
-    {
-        Quaternion rot = new Quaternion(
-            PlayerPrefs.GetFloat(RotX),
-            PlayerPrefs.GetFloat(RotY),
-            PlayerPrefs.GetFloat(RotZ),
-            PlayerPrefs.GetFloat(RotW)
+        savedRelativeRotation = new Quaternion(
+            PlayerPrefs.GetFloat(RelRotX),
+            PlayerPrefs.GetFloat(RelRotY),
+            PlayerPrefs.GetFloat(RelRotZ),
+            PlayerPrefs.GetFloat(RelRotW)
         );
 
-        env.rotation = rot;
-        Debug.Log("Applied saved environment rotation.");
+        transform.rotation = rotationAnchor.rotation * savedRelativeRotation;
     }
 
-    // Remove rotation data on delete
+    public bool HasSavedRotation()
+    {
+        return PlayerPrefs.HasKey(RelRotW);
+    }
+
     public void ClearRotation()
     {
-        PlayerPrefs.DeleteKey(RotX);
-        PlayerPrefs.DeleteKey(RotY);
-        PlayerPrefs.DeleteKey(RotZ);
-        PlayerPrefs.DeleteKey(RotW);
-
-        Debug.Log("Environment rotation cleared.");
+        PlayerPrefs.DeleteKey(RelRotX);
+        PlayerPrefs.DeleteKey(RelRotY);
+        PlayerPrefs.DeleteKey(RelRotZ);
+        PlayerPrefs.DeleteKey(RelRotW);
     }
 }
