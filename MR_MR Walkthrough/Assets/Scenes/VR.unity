@@ -6400,6 +6400,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Env VR
       objectReference: {fileID: 0}
+    - target: {fileID: 1952248602732315056, guid: 67a7e6183ccfef54fa1ed3376ce9336a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6785099427009982378, guid: 67a7e6183ccfef54fa1ed3376ce9336a,
         type: 3}
       propertyPath: m_LocalPosition.x
